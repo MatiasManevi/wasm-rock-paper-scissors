@@ -1,6 +1,6 @@
 # wasm-rock-paper-scissors
 
-Proof of concept web game made with C++ and WebAssembly
+Proof of concept web game made with C++ and WebAssembly. It is deployed with Github Pages here: https://matiasmanevi.github.io/wasm-rock-paper-scissors/.
 
 ## Compiling C++ into Wasm
 

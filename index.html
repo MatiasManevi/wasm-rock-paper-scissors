@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - WASM</title>
+</head>
+<body>
+    <h1>Rock Paper Scissors - WebAssembly</h1>
+    <button onclick="play(0)">Rock</button>
+    <button onclick="play(1)">Paper</button>
+    <button onclick="play(2)">Scissors</button>
+
+    <h2>Game Result:</h2>
+    <p><strong>You chose:</strong> <span id="playerChoice">-</span></p>
+    <p><strong>Computer chose:</strong> <span id="computerChoice">-</span></p>
+    <p><strong>Outcome:</strong> <span id="result">-</span></p>
+
+    <script type="module">
+        import Module from "./rock_paper_scissors.js";
+
+        Module().then((wasm) => {
+            const choices = ["Rock", "Paper", "Scissors"];
+
+            function play(choice) {
+                wasm.ccall("setPlayerChoice", null, ["number"], [choice]);
+                const computerChoice = wasm.ccall("getComputerChoice", "number");
+                const result = wasm.ccall("playGame", "string");
+
+                document.getElementById("playerChoice").innerText = choices[choice];
+                document.getElementById("computerChoice").innerText = choices[computerChoice];
+                document.getElementById("result").innerText = result;
+            }
+
+            window.play = play;
+        });
+    </script>
+</body>
+</html>

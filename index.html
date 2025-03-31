@@ -7,31 +7,33 @@
 </head>
 <body>
     <h1>Rock Paper Scissors - WebAssembly</h1>
-    <button onclick="play(0)">Rock</button>
-    <button onclick="play(1)">Paper</button>
-    <button onclick="play(2)">Scissors</button>
+    <button onclick="play('rock')">Rock</button>
+    <button onclick="play('paper')">Paper</button>
+    <button onclick="play('scissors')">Scissors</button>
 
     <h2>Game Result:</h2>
-    <p><strong>You chose:</strong> <span id="playerChoice">-</span></p>
-    <p><strong>Computer chose:</strong> <span id="computerChoice">-</span></p>
-    <p><strong>Outcome:</strong> <span id="result">-</span></p>
+    <p><span id="result">-</span></p>
 
     <script type="module">
         import Module from "./rock_paper_scissors.js";
 
         Module().then((wasm) => {
-            const choices = ["Rock", "Paper", "Scissors"];
+            const game = new wasm.RPSGame();
 
             function play(choice) {
-                wasm.ccall("setPlayerChoice", null, ["number"], [choice]);
-                const computerChoice = wasm.ccall("getComputerChoice", "number");
-                const result = wasm.ccall("playGame", "string");
-
-                document.getElementById("playerChoice").innerText = choices[choice];
-                document.getElementById("computerChoice").innerText = choices[computerChoice];
+                const result = game.play(choice);
                 document.getElementById("result").innerText = result;
             }
+            const movesHandle = game.getMoves();
+            console.log('getMoves', movesHandle);
+            console.log('getMoves size', movesHandle.size());
+            const moves = [];
 
+            for (let i = 0; i < movesHandle.size(); ++i) {
+                moves.push(movesHandle.get(i));
+            }
+
+            console.log(moves); // Output: ["rock", "paper", "scissors"]
             window.play = play;
         });
     </script>

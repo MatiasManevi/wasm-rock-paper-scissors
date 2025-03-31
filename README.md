@@ -9,10 +9,7 @@ If you change `rock_paper_scissors.cpp` file you will need to have Emscripten in
 
 In order to compile the C++ file run:
 ```sh
-emcc rock_paper_scissors.cpp -o rock_paper_scissors.js \
-    -s EXPORTED_FUNCTIONS='["_playGame"]' \
-    -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
-    -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT=web
+emcc rock_paper_scissors.cpp -o rock_paper_scissors.js -sMODULARIZE -sEXPORTED_RUNTIME_METHODS=ccall,cwrap --bind -s EXPORT_ES6=1 -s ENVIRONMENT=web
 ```
 
 This will generate:

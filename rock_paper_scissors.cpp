@@ -1,57 +1,46 @@
 #include <iostream>
-#include <emscripten.h>
-#include <cstdlib>
-#include <ctime>
+#include <vector>
+#include <string>
+#include <emscripten/bind.h>
 
-extern "C" {
+using namespace emscripten;
 
-// Choices array
-const char* choices[] = {"Rock", "Paper", "Scissors"};
+class RPSGame
+{
+public:
+    RPSGame() {} // Constructor
 
-// Store choices for access in JavaScript
-int lastPlayerChoice = -1;
-int lastComputerChoice = -1;
-
-// Generate computer's choice
-EMSCRIPTEN_KEEPALIVE
-int getComputerChoice() {
-    lastComputerChoice = std::rand() % 3;
-    return lastComputerChoice;
-}
-
-// Store the player's choice
-EMSCRIPTEN_KEEPALIVE
-void setPlayerChoice(int choice) {
-    lastPlayerChoice = choice;
-}
-
-// Get the player's choice
-EMSCRIPTEN_KEEPALIVE
-int getPlayerChoice() {
-    return lastPlayerChoice;
-}
-
-// Play the game and return the result
-EMSCRIPTEN_KEEPALIVE
-const char* playGame() {
-    if (lastPlayerChoice == -1 || lastComputerChoice == -1) {
-        return "Error: Choices not set!";
+    // Returns available moves
+    std::vector<std::string> getMoves()
+    {
+        return {"rock", "paper", "scissors"};
     }
 
-    if (lastPlayerChoice == lastComputerChoice) {
-        return "It's a tie!";
-    }
-    if ((lastPlayerChoice == 0 && lastComputerChoice == 2) ||
-        (lastPlayerChoice == 1 && lastComputerChoice == 0) ||
-        (lastPlayerChoice == 2 && lastComputerChoice == 1)) {
-        return "You win!";
-    }
-    return "You lose!";
-}
+    // Plays the game given a player move
+    std::string play(std::string playerMove)
+    {
+        std::vector<std::string> moves = getMoves();
+        std::string aiMove = moves[rand() % 3];
 
-}
+        if (playerMove == aiMove)
+        {
+            return "Tie! Both chose " + aiMove;
+        }
+        if ((playerMove == "rock" && aiMove == "scissors") ||
+            (playerMove == "scissors" && aiMove == "paper") ||
+            (playerMove == "paper" && aiMove == "rock"))
+        {
+            return "You win! " + playerMove + " beats " + aiMove;
+        }
+        return "You lose! " + aiMove + " beats " + playerMove;
+    }
+};
 
-int main() {
-    std::srand(std::time(0)); // Seed RNG
-    return 0;
+// Bindings
+EMSCRIPTEN_BINDINGS(my_module) {
+    emscripten::register_vector<std::string>("vector<string>");
+    emscripten::class_<RPSGame>("RPSGame")
+        .constructor<>()
+        .function("getMoves", &RPSGame::getMoves)
+        .function("play", &RPSGame::play);
 }
